@@ -1,9 +1,16 @@
 ## Forms and HTTP POST
 
+<<<<<<< HEAD
+
 ```mermaid
 sequenceDiagram
     participant browser
     participant server
+=======
+sequenceDiagram
+participant browser
+participant server
+>>>>>>> 4a9e018b1870c8b86df43bb779b7575d4da3d7c7
 
     browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
 
