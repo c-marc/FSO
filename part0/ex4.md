@@ -82,7 +82,10 @@ sequenceDiagram
 But here it's just one controlled request (provided we correctly prevented default submit behaviour):
 
 - The **rerendering** is done locally on the DOM
-- Data are sent as json
+- Submission is handled with a customized request:
+  - Default form handling is prevented
+  - Data are sent as JSON
+  - Response doesn't involve redirection
 - No refresh or reloading of anything
 
 ```mermaid
@@ -90,7 +93,7 @@ sequenceDiagram
     participant browser
     participant server
 
-    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
     activate server
 
     Note right of browser: Sent as JSON the payload.
