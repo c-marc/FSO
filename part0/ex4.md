@@ -1,5 +1,10 @@
 ## Forms and HTTP POST
 
+The diagram showing first full load of the page is prepended with the POST step:
+
+- with the payload encoded as the special form type
+- and the response a 302 code redirecting to the notes page (and triggering a refresh and a full reloading)
+
 ```mermaid
 sequenceDiagram
     participant browser
