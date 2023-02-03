@@ -6,11 +6,11 @@ sequenceDiagram
     participant server
 
     browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
-
-    Note right of browser: Sent as FormData (x-www-form-urlencoded) in the payload. Response with a 302 redirect, engaging the browser to start the GET sequence from the start.
-
     activate server
-    server-->>browser: HTML document
+
+    Note right of browser: Sent as FormData (x-www-form-urlencoded) in the payload.
+
+    server-->>browser: 302 redirect HTML toward /note
     deactivate server
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
