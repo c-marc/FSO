@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
-import axios from "axios";
+import personService from "./services/persons";
 
 const App = () => {
   //json server -p3001 --watch db.json
   useEffect(() => {
     console.log("Fetching...");
-    axios.get("http://localhost:3001/persons").then((response) => {
+    personService.getAll().then((response) => {
       console.log("Data received");
       setPersons(response.data);
     });
@@ -29,23 +29,51 @@ const App = () => {
     setFilter(e.target.value);
   };
 
+  const updatePerson = () => {
+    const confirmMessage = `${newName} is already added to phonebook, replace the old number with a new one?`;
+    if (!window.confirm(confirmMessage)) return;
+    //else update
+    const changedPerson = persons.find((p) => p.name === newName); //still ref!
+    personService
+      .update(changedPerson.id, { ...changedPerson, number: newNumber })
+      .then((response) =>
+        setPersons(
+          persons.map((p) => (p.id !== changedPerson.id ? p : response.data))
+        )
+      );
+  };
+
   const addPerson = (e) => {
     e.preventDefault();
     if (hasPerson(newName)) {
-      alert(`${newName} is already added to phonebook`);
-      return null;
+      return updatePerson();
     }
-    setPersons([...persons, { name: newName, number: newNumber }]);
-    setNewName("");
-    setNewNumber("");
+
+    const personObject = { name: newName, number: newNumber };
+
+    personService.create(personObject).then((response) => {
+      setPersons([...persons, response.data]);
+      setNewName("");
+      setNewNumber("");
+    });
   };
 
-  const hasPerson = (person) => persons.some((e) => e.name === person);
+  const removePerson = (id) => {
+    const currentPerson = persons.find((p) => p.id === id);
+    if (!window.confirm(`Delete ${currentPerson.name}?`)) return;
+
+    personService.remove(id).then(() => {
+      const newPersons = persons.filter((p) => p.id !== id);
+      setPersons(newPersons);
+    });
+  };
+
+  const hasPerson = (name) => persons.some((p) => p.name === name);
 
   const filterPersons = (filter) => {
     if (filter === "") return persons;
-    return persons.filter((el) =>
-      el.name.toLowerCase().includes(filter.toLowerCase())
+    return persons.filter((p) =>
+      p.name.toLowerCase().includes(filter.toLowerCase())
     );
   };
 
@@ -66,7 +94,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} removePerson={removePerson} />
     </div>
   );
 };
