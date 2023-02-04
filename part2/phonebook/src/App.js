@@ -3,6 +3,7 @@ import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 import personService from "./services/persons";
+import Notification from "./Notification";
 
 const App = () => {
   //json server -p3001 --watch db.json
@@ -18,6 +19,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
@@ -29,6 +31,11 @@ const App = () => {
     setFilter(e.target.value);
   };
 
+  const showNotification = (message) => {
+    setMessage(message);
+    setTimeout(() => setMessage(null), 3000);
+  };
+
   const updatePerson = () => {
     const confirmMessage = `${newName} is already added to phonebook, replace the old number with a new one?`;
     if (!window.confirm(confirmMessage)) return;
@@ -36,11 +43,21 @@ const App = () => {
     const changedPerson = persons.find((p) => p.name === newName); //still ref!
     personService
       .update(changedPerson.id, { ...changedPerson, number: newNumber })
-      .then((response) =>
+      .then((response) => {
         setPersons(
           persons.map((p) => (p.id !== changedPerson.id ? p : response.data))
-        )
-      );
+        );
+        showNotification({
+          text: `Updated ${changedPerson.name}`,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        showNotification({
+          text: `Information of ${changedPerson.name} was already removed from server`,
+          type: "error",
+        });
+      });
   };
 
   const addPerson = (e) => {
@@ -55,6 +72,10 @@ const App = () => {
       setPersons([...persons, response.data]);
       setNewName("");
       setNewNumber("");
+      showNotification({
+        text: `Added ${response.data.name}`,
+        type: "success",
+      });
     });
   };
 
@@ -65,6 +86,10 @@ const App = () => {
     personService.remove(id).then(() => {
       const newPersons = persons.filter((p) => p.id !== id);
       setPersons(newPersons);
+      showNotification({
+        text: `Removed ${currentPerson.name}`,
+        type: "success",
+      });
     });
   };
 
@@ -82,6 +107,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
       <h3>Add a new</h3>
