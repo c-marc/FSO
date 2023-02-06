@@ -36,13 +36,17 @@ function App() {
   //console.log(getCountry("France"));
   //
 
+  const showCountry = (name) => {
+    setFilter(name);
+  };
+
   let display;
   if (len > 10) {
     display = <p>{`${len} results`}: please be more specific.</p>;
   } else if (len === 1) {
     display = <CountryDetails country={getCountry(matchingNames[0].name)} />;
   } else {
-    display = <Countries countries={matchingNames} />;
+    display = <Countries countries={matchingNames} showCountry={showCountry} />;
   }
 
   return (
