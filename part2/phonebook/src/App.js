@@ -53,6 +53,8 @@ const App = () => {
         });
       })
       .catch((error) => {
+        console.log(error.response.data.error);
+        // TODO: but might also fail due to validation error...
         showNotification({
           text: `Information of ${changedPerson.name} was already removed from server`,
           type: "error",
@@ -68,15 +70,21 @@ const App = () => {
 
     const personObject = { name: newName, number: newNumber };
 
-    personService.create(personObject).then((response) => {
-      setPersons([...persons, response.data]);
-      setNewName("");
-      setNewNumber("");
-      showNotification({
-        text: `Added ${response.data.name}`,
-        type: "success",
+    personService
+      .create(personObject)
+      .then((response) => {
+        setPersons([...persons, response.data]);
+        setNewName("");
+        setNewNumber("");
+        showNotification({
+          text: `Added ${response.data.name}`,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        // this is the way to access the error message
+        console.log(error.response.data.error);
       });
-    });
   };
 
   const removePerson = (id) => {
